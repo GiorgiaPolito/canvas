@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween English Memory - 3ª Primaria</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(135deg, #120924 0%, #291147 50%, #17072b 100%);
+            min-height: 100vh;
+            color: #f3e8ff;
+        }
+
+        .font-creepster {
+            font-family: 'Creepster', cursive;
+        }
+
+        /* Perspective and 3D Flip Effects */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, #3b1566, #21083d);
+            border: 3px solid #ff7900;
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #ffffff, #f0e6ff);
+            transform: rotateY(180deg);
+            border: 3px solid #9333ea;
+            color: #2e1065;
+        }
+
+        .card-matched {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a0b2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff7900;
+            border-radius: 4px;
+        }
+
+        /* Floating animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 121, 0, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(255, 121, 0, 0.9); }
+        }
+        .active-turn {
+            animation: pulse-glow 2s infinite;
+            border-color: #ff7900 !important;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen p-2 sm:p-4 select-none">
+
+    <!-- Header -->
+    <header class="text-center my-2 sm:my-4 relative">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-creepster text-orange-500 tracking-wider drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">
+            🎃 Halloween English Memory 👻
+        </h1>
+        <p class="text-xs sm:text-base text-purple-300 font-semibold mt-1">
+            Learn English while playing! Match the pair: <span class="text-yellow-400">Picture 🖼️ ↔️ Word 🔤</span>
+        </p>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow flex items-center justify-center max-w-6xl mx-auto w-full">
+
+        <!-- SETUP SCREEN -->
+        <div id="setup-screen" class="bg-purple-950/80 backdrop-blur-md border-2 border-orange-500/50 rounded-3xl p-4 sm:p-8 w-full max-w-2xl shadow-2xl my-auto">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center text-orange-400 mb-6 flex items-center justify-center gap-2">
+                <span>🧙‍♀️</span> Game Setup 🎃
+            </h2>
+
+            <!-- Number of Players -->
+            <div class="mb-6">
+                <label class="block text-purple-200 text-base sm:text-lg font-semibold mb-2">
+                    1. How many players?
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" onclick="selectPlayerCount(2)" id="btn-player-2" class="player-count-btn bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl text-lg border-2 border-orange-300 transition flex items-center justify-center gap-2">
+                        <span>👥</span> 2 Players
+                    </button>
+                    <button type="button" onclick="selectPlayerCount(3)" id="btn-player-3" class="player-count-btn bg-purple-900/60 hover:bg-purple-800 text-purple-200 font-bold py-3 px-4 rounded-xl text-lg border-2 border-purple-700 transition flex items-center justify-center gap-2">
+                        <span>👥👤</span> 3 Players
+                    </button>
+                </div>
+            </div>
+
+            <!-- Player Setup Cards -->
+            <div id="players-input-container" class="space-y-4 mb-6">
+                <!-- Dynamically filled by JS -->
+            </div>
+
+            <!-- Number of Pairs -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <label for="pair-slider" class="text-purple-200 text-base sm:text-lg font-semibold">
+                        2. How many words do you want to play with?
+                    </label>
+                    <span id="pair-count-display" class="bg-orange-500 text-slate-950 font-extrabold px-3 py-1 rounded-full text-lg">
+                        10 Pairs
+                    </span>
+                </div>
+                <input type="range" id="pair-slider" min="10" max="15" value="10" step="1" 
+                    oninput="updatePairCount(this.value)"
+                    class="w-full h-3 bg-purple-900 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                <div class="flex justify-between text-xs text-purple-300 px-1 mt-1 font-semibold">
+                    <span>10 words (Easy)</span>
+                    <span>12 words</span>
+                    <span>15 words (All!)</span>
+                </div>
+            </div>
+
+            <!-- Start Game Button -->
+            <button onclick="startGame()" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-400 hover:to-amber-400 text-purple-950 font-extrabold text-2xl py-4 rounded-2xl shadow-lg border-2 border-yellow-300 transform active:scale-95 transition">
+                🚀 START HALLOWEEN CHALLENGE! 🎃
+            </button>
+        </div>
+
+        <!-- GAME BOARD SCREEN (Hidden initially) -->
+        <div id="game-screen" class="hidden flex-col w-full">
+            
+            <!-- Scoreboard Bar -->
+            <div id="scoreboard" class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
+                <!-- Filled dynamically with player scorecards -->
+            </div>
+
+            <!-- Controls & Pronunciation Toggle -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-purple-950/60 p-3 rounded-2xl border border-purple-800">
+                <div class="text-xs sm:text-sm text-purple-300 font-medium">
+                    💡 Tocca una carta per girarla. Trova l'immagine e la parola in inglese corrispondente!
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleAudio()" id="audio-toggle-btn" class="bg-purple-800 hover:bg-purple-700 text-purple-200 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 border border-purple-600">
+                        🔊 Voce: ON
+                    </button>
+                    <button onclick="confirmRestart()" class="bg-red-800/80 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1 border border-red-500">
+                        🔄 Nuova Partita
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cards Memory Table -->
+            <div id="memory-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 sm:gap-3 lg:gap-4 justify-center items-center">
+                <!-- Memory cards generated here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- WINNER MODAL -->
+    <div id="winner-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4 z-50">
+        <div class="bg-gradient-to-b from-purple-900 to-purple-950 border-4 border-orange-500 rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl animate-float">
+            <div class="text-6xl mb-2" id="winner-avatar">🏆</div>
+            <h2 class="text-3xl sm:text-4xl font-creepster text-orange-400 mb-2">VITTORIA SPETTRALE!</h2>
+            <p id="winner-title" class="text-xl sm:text-2xl font-bold text-yellow-300 mb-4">
+                vince la sfida di Halloween!
+            </p>
+            
+            <div id="final-scores-list" class="bg-purple-900/50 rounded-2xl p-4 mb-6 space-y-2 border border-purple-700 text-left">
+                <!-- Final scores list -->
+            </div>
+
+            <button onclick="resetToSetup()" class="w-full bg-orange-500 hover:bg-orange-400 text-purple-950 font-extrabold text-xl py-3 rounded-xl border-2 border-yellow-300 shadow-lg transform active:scale-95 transition">
+                🔄 Gioca Ancora!
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        /* ==================== GAME DATA ==================== */
+        // Available Avatars (All in English)
+        const AVATARS = [
+            { id: 'witch', name: 'Witch', emoji: '🧙‍♀️', pointIcon: '🧹 Broom Points' },
+            { id: 'werewolf', name: 'Werewolf', emoji: '🐺', pointIcon: '🐾 Claw Points' },
+            { id: 'ghost', name: 'Ghost', emoji: '👻', pointIcon: '👻 Boo Points' },
+            { id: 'pumpkin', name: 'Pumpkin', emoji: '🎃', pointIcon: '🎃 Pumpkin Points' },
+            { id: 'vampire', name: 'Vampire', emoji: '🧛', pointIcon: '🦇 Bat Points' },
+            { id: 'zombie', name: 'Zombie', emoji: '🧟', pointIcon: '🧠 Brain Points' },
+            { id: 'mummy', name: 'Mummy', emoji: '🧟‍♂️', pointIcon: '📜 Bandage Points' },
+            { id: 'cat', name: 'Black Cat', emoji: '🐈‍⬛', pointIcon: '🐾 Cat Points' }
+        ];
+
+        // 15 Words dataset with high quality inline SVG visuals
+        const MASTER_WORDS = [
+            {
+                id: 'green',
+                word: 'green',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M50 15 C 20 20, 10 50, 50 85 C 90 50, 80 20, 50 15 Z" fill="#22c55e" stroke="#15803d" stroke-width="4"/><path d="M50 15 L50 85" stroke="#15803d" stroke-width="3"/><circle cx="35" cy="40" r="4" fill="#86efac"/><circle cx="65" cy="45" r="3" fill="#86efac"/></svg>`
+            },
+            {
+                id: 'tree',
+                word: 'tree',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><rect x="42" y="60" width="16" height="30" fill="#78350f" rx="3"/><path d="M50 10 L15 65 L85 65 Z" fill="#15803d"/><path d="M50 25 L25 60 L75 60 Z" fill="#22c55e"/><circle cx="40" cy="35" r="3" fill="#facc15"/><circle cx="60" cy="45" r="3" fill="#ef4444"/></svg>`
+            },
+            {
+                id: 'sweet',
+                word: 'sweet',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M15 35 L35 50 L15 65 Z" fill="#f97316"/><path d="M85 35 L65 50 L85 65 Z" fill="#f97316"/><circle cx="50" cy="50" r="22" fill="#a855f7" stroke="#7e22ce" stroke-width="3"/><path d="M35 50 Q 50 30, 65 50" fill="none" stroke="#facc15" stroke-width="4"/></svg>`
+            },
+            {
+                id: 'halloween',
+                word: 'halloween',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><rect x="45" y="10" width="10" height="15" fill="#15803d" rx="2"/><ellipse cx="50" cy="55" rx="38" ry="32" fill="#f97316" stroke="#c2410c" stroke-width="3"/><polygon points="32,45 42,45 37,35" fill="#451a03"/><polygon points="58,45 68,45 63,35" fill="#451a03"/><polygon points="50,55 45,60 55,60" fill="#451a03"/><path d="M30 68 Q50 80 70 68" fill="none" stroke="#451a03" stroke-width="4" stroke-linecap="round"/></svg>`
+            },
+            {
+                id: 'teeth',
+                word: 'teeth',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M15 35 Q50 20 85 35 Q50 85 15 35 Z" fill="#991b1b"/><rect x="25" y="36" width="10" height="12" fill="#ffffff" rx="2"/><rect x="37" y="36" width="10" height="12" fill="#ffffff" rx="2"/><rect x="53" y="36" width="10" height="12" fill="#ffffff" rx="2"/><rect x="65" y="36" width="10" height="12" fill="#ffffff" rx="2"/><polygon points="25,36 30,58 35,36" fill="#ffffff"/><polygon points="65,36 70,58 75,36" fill="#ffffff"/></svg>`
+            },
+            {
+                id: 'sleep',
+                word: 'sleep',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M60 15 A 30 30 0 1 0 85 60 A 25 25 0 1 1 60 15 Z" fill="#facc15"/><text x="65" y="30" font-size="18" fill="#a855f7" font-weight="bold">Z</text><text x="75" y="45" font-size="14" fill="#a855f7" font-weight="bold">z</text><text x="82" y="58" font-size="10" fill="#a855f7" font-weight="bold">z</text></svg>`
+            },
+            {
+                id: 'week',
+                word: 'week',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><rect x="15" y="20" width="70" height="65" fill="#ffffff" rx="8" stroke="#6b21a8" stroke-width="4"/><rect x="15" y="20" width="70" height="20" fill="#a855f7" rx="4"/><text x="50" y="35" font-size="12" fill="#ffffff" font-weight="bold" text-anchor="middle">7 DAYS</text><text x="50" y="68" font-size="22" fill="#6b21a8" font-weight="extrabold" text-anchor="middle">WEEK</text></svg>`
+            },
+            {
+                id: 'street',
+                word: 'street',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><polygon points="30,90 70,90 58,40 42,40" fill="#475569"/><line x1="50" y1="90" x2="50" y2="40" stroke="#facc15" stroke-width="3" stroke-dasharray="6,4"/><path d="M72 30 L72 85" stroke="#334155" stroke-width="4"/><circle cx="72" cy="28" r="8" fill="#facc15"/></svg>`
+            },
+            {
+                id: 'bee',
+                word: 'bee',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><ellipse cx="50" cy="55" rx="25" ry="18" fill="#facc15" stroke="#000" stroke-width="2"/><line x1="42" y1="38" x2="42" y2="72" stroke="#000" stroke-width="5"/><line x1="55" y1="38" x2="55" y2="72" stroke="#000" stroke-width="5"/><ellipse cx="32" cy="35" rx="10" ry="14" fill="#e0f2fe" opacity="0.8" transform="rotate(-20 32 35)"/><ellipse cx="50" cy="32" rx="10" ry="14" fill="#e0f2fe" opacity="0.8" transform="rotate(20 50 32)"/><circle cx="65" cy="50" r="2" fill="#000"/></svg>`
+            },
+            {
+                id: 'feet',
+                word: 'feet',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><ellipse cx="38" cy="55" rx="12" ry="22" fill="#fbcfe8" transform="rotate(-10 38 55)"/><circle cx="30" cy="28" r="4" fill="#fbcfe8"/><circle cx="38" cy="26" r="3.5" fill="#fbcfe8"/><circle cx="45" cy="28" r="3" fill="#fbcfe8"/><ellipse cx="65" cy="55" rx="12" ry="22" fill="#fbcfe8" transform="rotate(10 65 55)"/><circle cx="58" cy="28" r="3" fill="#fbcfe8"/><circle cx="65" cy="26" r="3.5" fill="#fbcfe8"/><circle cx="73" cy="28" r="4" fill="#fbcfe8"/></svg>`
+            },
+            {
+                id: 'beef',
+                word: 'beef',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M20 40 C 20 20, 80 20, 80 50 C 80 75, 30 85, 20 40 Z" fill="#ef4444" stroke="#991b1b" stroke-width="4"/><circle cx="40" cy="45" r="8" fill="#ffffff"/><path d="M30 35 Q 50 30, 70 45" stroke="#fca5a5" stroke-width="3" fill="none"/></svg>`
+            },
+            {
+                id: 'free',
+                word: 'free',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M25 45 L25 85 L75 85 L75 45 Z" fill="none" stroke="#f59e0b" stroke-width="4"/><path d="M25 45 C 25 15, 75 15, 75 45" fill="none" stroke="#f59e0b" stroke-width="4"/><line x1="40" y1="45" x2="40" y2="85" stroke="#f59e0b" stroke-width="3"/><path d="M70 25 L88 15" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/><polygon points="88,15 80,16 85,22" fill="#22c55e"/><text x="50" y="70" font-size="14" fill="#22c55e" font-weight="bold" text-anchor="middle">FREE!</text></svg>`
+            },
+            {
+                id: 'creepy',
+                word: 'creepy',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><line x1="50" y1="0" x2="50" y2="35" stroke="#94a3b8" stroke-width="2"/><circle cx="50" cy="55" r="18" fill="#0f172a"/><circle cx="44" cy="52" r="4" fill="#ef4444"/><circle cx="56" cy="52" r="4" fill="#ef4444"/><path d="M35 50 Q 15 40 10 55" stroke="#0f172a" stroke-width="3" fill="none"/><path d="M35 55 Q 15 55 10 70" stroke="#0f172a" stroke-width="3" fill="none"/><path d="M65 50 Q 85 40 90 55" stroke="#0f172a" stroke-width="3" fill="none"/><path d="M65 55 Q 85 55 90 70" stroke="#0f172a" stroke-width="3" fill="none"/></svg>`
+            },
+            {
+                id: 'sleepover',
+                word: 'sleepover',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><polygon points="50,20 15,75 85,75" fill="#8b5cf6" stroke="#6d28d9" stroke-width="3"/><polygon points="50,20 35,75 65,75" fill="#a855f7"/><path d="M40 75 L50 50 L60 75" fill="#fef08a"/><circle cx="20" cy="25" r="2" fill="#facc15"/><circle cx="80" cy="20" r="3" fill="#facc15"/></svg>`
+            },
+            {
+                id: 'meet',
+                word: 'meet',
+                svg: `<svg viewBox="0 0 100 100" class="w-12 h-12 sm:w-16 sm:h-16"><path d="M20 60 C 20 35, 40 35, 40 60 C 40 75, 20 75, 20 60 Z" fill="#e2e8f0"/><circle cx="28" cy="50" r="2" fill="#000"/><circle cx="34" cy="50" r="2" fill="#000"/><path d="M80 60 C 80 35, 60 35, 60 60 C 60 75, 80 75, 80 60 Z" fill="#e2e8f0"/><circle cx="66" cy="50" r="2" fill="#000"/><circle cx="72" cy="50" r="2" fill="#000"/><path d="M38 55 L62 55" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/></svg>`
+            }
+        ];
+
+        /* ==================== STATE VARIABLES ==================== */
+        let playerCount = 2;
+        let selectedPairCount = 10;
+        let players = [];
+        let currentTurn = 0;
+        let cards = [];
+        let flippedCards = [];
+        let isProcessing = false;
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        /* ==================== AUDIO SYNTHESIS & SPEECH ==================== */
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'flip') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'match') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.setValueAtTime(600, now + 0.12);
+                    osc.frequency.setValueAtTime(800, now + 0.24);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(180, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'win') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.setValueAtTime(523, now + 0.15);
+                    osc.frequency.setValueAtTime(659, now + 0.3);
+                    osc.frequency.setValueAtTime(783, now + 0.45);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+                    osc.start(now);
+                    osc.stop(now + 0.7);
+                }
+            } catch (e) {
+                console.log('Audio Context Error:', e);
+            }
+        }
+
+        // Web Speech API for English Pronunciation
+        function speakEnglishWord(word) {
+            if (!audioEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any pending speech
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Slightly slower for primary school kids
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-toggle-btn');
+            btn.innerHTML = audioEnabled ? '🔊 Voce: ON' : '🔇 Voce: OFF';
+            btn.classList.toggle('bg-purple-800', audioEnabled);
+            btn.classList.toggle('bg-gray-700', !audioEnabled);
+        }
+
+        /* ==================== SETUP LOGIC ==================== */
+        function selectPlayerCount(count) {
+            playerCount = count;
+            document.getElementById('btn-player-2').className = count === 2 
+                ? 'player-count-btn bg-orange-600 text-white font-bold py-3 px-4 rounded-xl text-lg border-2 border-orange-300 transition flex items-center justify-center gap-2'
+                : 'player-count-btn bg-purple-900/60 text-purple-200 font-bold py-3 px-4 rounded-xl text-lg border-2 border-purple-700 transition flex items-center justify-center gap-2';
+            
+            document.getElementById('btn-player-3').className = count === 3 
+                ? 'player-count-btn bg-orange-600 text-white font-bold py-3 px-4 rounded-xl text-lg border-2 border-orange-300 transition flex items-center justify-center gap-2'
+                : 'player-count-btn bg-purple-900/60 text-purple-200 font-bold py-3 px-4 rounded-xl text-lg border-2 border-purple-700 transition flex items-center justify-center gap-2';
+            
+            renderPlayerInputs();
+        }
+
+        function renderPlayerInputs() {
+            const container = document.getElementById('players-input-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < playerCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'bg-purple-900/50 p-4 rounded-2xl border border-purple-700';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-orange-400 text-base sm:text-lg min-w-[90px]">Player ${i + 1}:</span>
+                        <select id="player-avatar-${i}" class="bg-purple-950 border-2 border-purple-600 rounded-xl px-4 py-2.5 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-orange-400 flex-grow cursor-pointer">
+                            ${AVATARS.map((av, idx) => `
+                                <option value="${av.id}" ${idx === i ? 'selected' : ''}>
+                                    ${av.emoji} Team ${av.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function updatePairCount(val) {
+            selectedPairCount = parseInt(val);
+            document.getElementById('pair-count-display').innerText = `${selectedPairCount} Pairs`;
+        }
+
+        /* ==================== GAME START & INITIALIZATION ==================== */
+        function startGame() {
+            initAudio();
+            players = [];
+
+            for (let i = 0; i < playerCount; i++) {
+                const avatarId = document.getElementById(`player-avatar-${i}`).value;
+                const avatarObj = AVATARS.find(a => a.id === avatarId) || AVATARS[i % AVATARS.length];
+
+                players.push({
+                    id: i,
+                    name: `Team ${avatarObj.name}`,
+                    avatar: avatarObj.emoji,
+                    avatarName: avatarObj.name,
+                    pointIcon: avatarObj.pointIcon,
+                    score: 0
+                });
+            }
+
+            currentTurn = 0;
+            generateCards();
+            renderScoreboard();
+            renderGrid();
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+        }
+
+        function generateCards() {
+            // Pick selected number of words
+            const chosenWords = [...MASTER_WORDS].sort(() => 0.5 - Math.random()).slice(0, selectedPairCount);
+            
+            cards = [];
+            chosenWords.forEach(item => {
+                const upperWord = item.word.toUpperCase();
+                // Card 1: Image Card
+                cards.push({
+                    id: `${item.id}-img`,
+                    pairId: item.id,
+                    type: 'image',
+                    word: upperWord,
+                    svg: item.svg,
+                    isFlipped: false,
+                    isMatched: false
+                });
+
+                // Card 2: Word Card
+                cards.push({
+                    id: `${item.id}-word`,
+                    pairId: item.id,
+                    type: 'word',
+                    word: upperWord,
+                    svg: null,
+                    isFlipped: false,
+                    isMatched: false
+                });
+            });
+
+            // Fisher-Yates Shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+        }
+
+        /* ==================== RENDER BOARD ==================== */
+        function renderScoreboard() {
+            const scoreboard = document.getElementById('scoreboard');
+            scoreboard.innerHTML = '';
+
+            players.forEach((p, idx) => {
+                const isCurrent = idx === currentTurn;
+                const card = document.createElement('div');
+                card.className = `bg-purple-900/70 border-2 rounded-2xl p-3 sm:p-4 flex items-center justify-between transition-all ${
+                    isCurrent ? 'active-turn bg-purple-800/90 border-orange-500 scale-105 shadow-xl' : 'border-purple-700/50 opacity-80'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                        <span class="text-3xl sm:text-4xl animate-bounce">${p.avatar}</span>
+                        <div class="truncate">
+                            <div class="text-xs sm:text-sm text-purple-300 font-semibold truncate">${p.name}</div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-orange-400">${p.score} <span class="text-xs font-normal text-purple-200">pt</span></div>
+                        </div>
+                    </div>
+                    ${isCurrent ? `<span class="bg-orange-500 text-purple-950 text-xs font-extrabold px-2 py-1 rounded-full uppercase tracking-wider animate-pulse">TURNO</span>` : ''}
+                `;
+                scoreboard.appendChild(card);
+            });
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+
+            cards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = `card perspective-1000 h-28 sm:h-36 lg:h-40 cursor-pointer ${card.isFlipped ? 'flipped' : ''} ${card.isMatched ? 'card-matched' : ''}`;
+                cardEl.id = `card-${index}`;
+                cardEl.onclick = () => handleCardClick(index);
+
+                cardEl.innerHTML = `
+                    <div class="card-inner">
+                        <!-- BACK OF CARD -->
+                        <div class="card-back flex flex-col items-center justify-center p-2">
+                            <span class="text-3xl sm:text-4xl opacity-80">🎃</span>
+                            <span class="text-[10px] sm:text-xs font-creepster text-orange-400 mt-1 tracking-widest">ENGLISH</span>
+                        </div>
+                        <!-- FRONT OF CARD -->
+                        <div class="card-front p-2 text-center">
+                            ${card.type === 'image' 
+                                ? `<div class="flex flex-col items-center justify-center h-full">
+                                     ${card.svg}
+                                   </div>`
+                                : `<div class="flex flex-col items-center justify-center h-full">
+                                     <span class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-purple-900 tracking-wide font-mono">${card.word}</span>
+                                   </div>`
+                            }
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardEl);
+            });
+        }
+
+        /* ==================== CARD CLICK LOGIC ==================== */
+        function handleCardClick(index) {
+            if (isProcessing) return;
+            const card = cards[index];
+
+            if (card.isFlipped || card.isMatched) return;
+
+            // Flip card
+            card.isFlipped = true;
+            playSound('flip');
+            
+            // Speak word on flip
+            speakEnglishWord(card.word);
+
+            // Update DOM element flip
+            const cardEl = document.getElementById(`card-${index}`);
+            if (cardEl) cardEl.classList.add('flipped');
+
+            flippedCards.push({ card, index });
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            isProcessing = true;
+            const [first, second] = flippedCards;
+
+            const isMatch = (first.card.pairId === second.card.pairId) && (first.card.type !== second.card.type);
+
+            if (isMatch) {
+                // SUCCESS MATCH
+                setTimeout(() => {
+                    playSound('match');
+                    
+                    // Mark as matched
+                    first.card.isMatched = true;
+                    second.card.isMatched = true;
+
+                    // Hide cards visually
+                    const el1 = document.getElementById(`card-${first.index}`);
+                    const el2 = document.getElementById(`card-${second.index}`);
+                    if (el1) el1.classList.add('card-matched');
+                    if (el2) el2.classList.add('card-matched');
+
+                    // Add point to current player
+                    players[currentTurn].score += 1;
+                    
+                    // Pronounce word clearly on match!
+                    speakEnglishWord(`Great! ${first.card.word}`);
+
+                    flippedCards = [];
+                    isProcessing = false;
+
+                    renderScoreboard();
+
+                    // Check victory
+                    if (cards.every(c => c.isMatched)) {
+                        setTimeout(endGame, 600);
+                    }
+                    // Player gets another turn on match!
+                }, 800);
+
+            } else {
+                // NO MATCH
+                setTimeout(() => {
+                    playSound('wrong');
+                    
+                    first.card.isFlipped = false;
+                    second.card.isFlipped = false;
+
+                    const el1 = document.getElementById(`card-${first.index}`);
+                    const el2 = document.getElementById(`card-${second.index}`);
+                    if (el1) el1.classList.remove('flipped');
+                    if (el2) el2.classList.remove('flipped');
+
+                    flippedCards = [];
+                    
+                    // Next player turn
+                    currentTurn = (currentTurn + 1) % players.length;
+                    renderScoreboard();
+
+                    isProcessing = false;
+                }, 1400);
+            }
+        }
+
+        /* ==================== END GAME & RESET ==================== */
+        function endGame() {
+            playSound('win');
+            
+            // Sort players by score
+            const sorted = [...players].sort((a, b) => b.score - a.score);
+            const winner = sorted[0];
+
+            document.getElementById('winner-avatar').innerText = winner.avatar;
+            document.getElementById('winner-title').innerText = `${winner.name} vince la sfida! 🎉`;
+
+            const scoreList = document.getElementById('final-scores-list');
+            scoreList.innerHTML = sorted.map((p, rank) => `
+                <div class="flex justify-between items-center text-base sm:text-lg font-bold text-purple-200">
+                    <span>${rank === 0 ? '🥇' : rank === 1 ? '🥈' : '🥉'} ${p.avatar} ${p.name}</span>
+                    <span class="text-orange-400 font-extrabold">${p.score} Coppie</span>
+                </div>
+            `).join('');
+
+            document.getElementById('winner-modal').classList.remove('hidden');
+            document.getElementById('winner-modal').classList.add('flex');
+        }
+
+        function resetToSetup() {
+            document.getElementById('winner-modal').classList.add('hidden');
+            document.getElementById('winner-modal').classList.remove('flex');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('setup-screen').classList.remove('hidden');
+        }
+
+        function confirmRestart() {
+            if (confirm("Vuoi ricominciare una nuova partita?")) {
+                resetToSetup();
+            }
+        }
+
+        /* Initialize Setup Inputs on Load */
+        window.onload = function() {
+            renderPlayerInputs();
+        };
+    </script>
+</body>
+</html>
