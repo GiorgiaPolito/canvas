@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Activities | Giorgia Polito</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-grid-pattern {
+            background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 bg-grid-pattern text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navigation Bar / Header -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Canvas Activities</h1>
+                    <p class="text-xs font-medium text-slate-500">by Giorgia Polito</p>
+                </div>
+            </div>
+
+            <!-- GitHub Repository Button -->
+            <a href="https://github.com/GiorgiaPolito/canvas" target="_blank" rel="noopener noreferrer" 
+               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300/80 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
+                <svg class="w-5 h-5 text-slate-800" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg>
+                <span>GitHub Repo</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero & Search Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 text-center">
+        <div class="max-w-3xl mx-auto">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 mb-4 border border-indigo-200">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                Attività Canvas Interattive
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Esplora le attività didattiche e ludiche
+            </h2>
+            <p class="mt-3 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+                Una collezione di applicazioni interattive create in HTML5 Canvas pensate per l'apprendimento, la geometria e l'allenamento della memoria.
+            </p>
+
+            <!-- Search Bar & Filters -->
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xl mx-auto">
+                <div class="relative w-full">
+                    <input type="text" id="searchInput" placeholder="Cerca un'attività..." 
+                           class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition">
+                    <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                
+                <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                    <button onclick="filterCategory('all')" class="filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm whitespace-nowrap" data-category="all">Tutti</button>
+                    <button onclick="filterCategory('geometria')" class="filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm whitespace-nowrap" data-category="geometria">Geometria</button>
+                    <button onclick="filterCategory('memory')" class="filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm whitespace-nowrap" data-category="memory">Memory</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Grid Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
+        
+        <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- 1. Geopiano Card -->
+            <article class="activity-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col transform hover:-translate-y-1"
+                     data-title="geopiano geometria forme" data-category="geometria">
+                <div class="h-48 bg-gradient-to-br from-indigo-50 via-indigo-100/50 to-slate-50 flex items-center justify-center p-6 border-b border-slate-100 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <!-- Geopiano Custom SVG Icon -->
+                    <div class="w-24 h-24 rounded-2xl bg-white/80 backdrop-blur shadow-sm p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-indigo-100">
+                        <svg class="w-16 h-16 text-indigo-600" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                            <!-- Grid Pegs -->
+                            <circle cx="20" cy="20" r="4" fill="currentColor" />
+                            <circle cx="50" cy="20" r="4" fill="currentColor" />
+                            <circle cx="80" cy="20" r="4" fill="currentColor" />
+                            <circle cx="20" cy="50" r="4" fill="currentColor" />
+                            <circle cx="50" cy="50" r="4" fill="currentColor" />
+                            <circle cx="80" cy="50" r="4" fill="currentColor" />
+                            <circle cx="20" cy="80" r="4" fill="currentColor" />
+                            <circle cx="50" cy="80" r="4" fill="currentColor" />
+                            <circle cx="80" cy="80" r="4" fill="currentColor" />
+                            <!-- Rubber Band Polygon -->
+                            <polygon points="20,20 80,20 50,80" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500 opacity-80" fill="rgba(99, 102, 241, 0.15)" />
+                        </svg>
+                    </div>
+                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200">Geometria</span>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors duration-200">
+                        Geopiano
+                    </h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed flex-grow">
+                        Esplora la geometria dinamica, costruisci forme e analizza perimetri ed aree mediante un geopiano virtuale interattivo.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-medium">Aggiornato di recente</span>
+                        <a href="memorystagioni.html" class="inline-flex items-center text-sm font-semibold text-emerald-600 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
+                            Apri attività
+                            <svg class="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3. Memory Halloween Card -->
+            <article class="activity-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col transform hover:-translate-y-1"
+                     data-title="memory halloween zucca mostri gioco carte" data-category="memory">
+                <div class="h-48 bg-gradient-to-br from-amber-50 via-amber-100/60 to-orange-50 flex items-center justify-center p-6 border-b border-slate-100 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <!-- Halloween Pumpkin SVG Icon -->
+                    <div class="w-24 h-24 rounded-2xl bg-white/80 backdrop-blur shadow-sm p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-amber-200">
+                        <svg class="w-16 h-16 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v3M9 5c1.5 0 2.5 1 3 2c.5-1 1.5-2 3-2"></path>
+                            <path d="M12 22c-5 0-9-3.5-9-8s4-8 9-8 9 3.5 9 8-4 8-9 8z" fill="rgba(245, 158, 11, 0.15)"></path>
+                            <path d="M9 11l1 1.5-1 1.5M15 11l-1 1.5 1 1.5M9 17h6l-1 1h-4z"></path>
+                        </svg>
+                    </div>
+                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">Halloween</span>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors duration-200">
+                        Memory di Halloween
+                    </h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed flex-grow">
+                        Metti alla prova la memoria in una divertente atmosfera spettrale popolata da zucche, pipistrelli e fantasmi.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-medium">Aggiornato di recente</span>
+                        <a href="halloweenmemory.html" class="inline-flex items-center text-sm font-semibold text-amber-600 group-hover:text-amber-700 group-hover:translate-x-1 transition-all">
+                            Apri attività
+                            <svg class="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 2. Memory Stagioni Card -->
+            <article class="activity-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col transform hover:-translate-y-1"
+                     data-title="memory stagioni gioco carte primavera estate autunno inverno" data-category="memory">
+                <div class="h-48 bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-slate-50 flex items-center justify-center p-6 border-b border-slate-100 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <!-- Memory Seasons Custom SVG Icon -->
+                    <div class="w-24 h-24 rounded-2xl bg-white/80 backdrop-blur shadow-sm p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-emerald-100">
+                        <svg class="w-16 h-16 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="8" height="8" rx="2" fill="rgba(16, 185, 129, 0.1)" />
+                            <rect x="13" y="3" width="8" height="8" rx="2" fill="rgba(16, 185, 129, 0.1)" />
+                            <rect x="3" y="13" width="8" height="8" rx="2" fill="rgba(16, 185, 129, 0.1)" />
+                            <rect x="13" y="13" width="8" height="8" rx="2" stroke-dasharray="2 2" />
+                            <!-- Sun & Leaf mini detail -->
+                            <circle cx="7" cy="7" r="2" />
+                            <path d="M17 7l-2 2" />
+                            <path d="M7 17l1-2" />
+                        </svg>
+                    </div>
+                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Stagioni</span>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors duration-200">
+                        Memory sulle Stagioni
+                    </h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed flex-grow">
+                        Allena la tua memoria con un gioco classico di carte interattivo a tema stagioni (Primavera, Estate, Autunno e Inverno).
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-medium">Aggiornato di recente</span>
+                        <a href="memory.html" class="inline-flex items-center text-sm font-semibold text-emerald-600 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all">
+                            Apri attività
+                            <svg class="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 3. Memory Halloween Card -->
+            <article class="activity-card group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col transform hover:-translate-y-1"
+                     data-title="memory halloween zucca mostri gioco carte" data-category="memory">
+                <div class="h-48 bg-gradient-to-br from-amber-50 via-amber-100/60 to-orange-50 flex items-center justify-center p-6 border-b border-slate-100 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <!-- Halloween Pumpkin SVG Icon -->
+                    <div class="w-24 h-24 rounded-2xl bg-white/80 backdrop-blur shadow-sm p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-amber-200">
+                        <svg class="w-16 h-16 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v3M9 5c1.5 0 2.5 1 3 2c.5-1 1.5-2 3-2"></path>
+                            <path d="M12 22c-5 0-9-3.5-9-8s4-8 9-8 9 3.5 9 8-4 8-9 8z" fill="rgba(245, 158, 11, 0.15)"></path>
+                            <path d="M9 11l1 1.5-1 1.5M15 11l-1 1.5 1 1.5M9 17h6l-1 1h-4z"></path>
+                        </svg>
+                    </div>
+                    <span class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">Halloween</span>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors duration-200">
+                        Memory di Halloween
+                    </h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed flex-grow">
+                        Metti alla prova la memoria in una divertente atmosfera spettrale popolata da zucche, pipistrelli e fantasmi.
+                    </p>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-medium">Aggiornato di recente</span>
+                        <a href="memoryhalloween.html" class="inline-flex items-center text-sm font-semibold text-amber-600 group-hover:text-amber-700 group-hover:translate-x-1 transition-all">
+                            Apri attività
+                            <svg class="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- No Results Fallback -->
+        <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="text-lg font-bold text-slate-700">Nessuna attività trovata</h3>
+            <p class="text-sm text-slate-500 mt-1">Prova a cambiare i criteri di ricerca o seleziona un'altra categoria.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8 text-center text-slate-500 text-sm mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>
+                &copy; <span id="year"></span> <span class="font-semibold text-slate-700">Giorgia Polito</span>. Tutti i diritti riservati.
+            </p>
+            <p class="text-xs text-slate-400">
+                Sviluppato con HTML5 Canvas e Tailwind CSS
+            </p>
+        </div>
+    </footer>
+
+    <!-- Search & Filter Logic -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const searchInput = document.getElementById('searchInput');
+        const cards = document.querySelectorAll('.activity-card');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const noResults = document.getElementById('noResults');
+
+        let currentCategory = 'all';
+
+        function updateFilters() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const category = card.getAttribute('data-category');
+
+                const matchesSearch = title.includes(query);
+                const matchesCategory = (currentCategory === 'all') || (category === currentCategory);
+
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            filterBtns.forEach(btn => {
+                if (btn.getAttribute('data-category') === cat) {
+                    btn.className = 'filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm whitespace-nowrap';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm whitespace-nowrap';
+                }
+            });
+            updateFilters();
+        }
+
+        searchInput.addEventListener('input', updateFilters);
+    </script>
+</body>
+</html>
