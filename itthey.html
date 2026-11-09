@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Super Stars - IT & THEY Challenge</title>
+    <!-- Tailwind CSS per uno stile moderno e vivace -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Lexend per massima leggibilità per bambini -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Lexend:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Effetto pulsanti LIM 3D */
+        .btn-3d {
+            transition: all 0.1s ease;
+            box-shadow: 0px 8px 0px rgba(0,0,0,0.25);
+        }
+        .btn-3d:active {
+            transform: translateY(6px);
+            box-shadow: 0px 2px 0px rgba(0,0,0,0.25);
+        }
+
+        /* Animazioni */
+        @keyframes pulse-grow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        .animate-pulse-grow {
+            animation: pulse-grow 2s infinite ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-12px); }
+            40%, 80% { transform: translateX(12px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Scrollbar personalizzata */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #facc15;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+    <!-- TOP BAR / HEADER -->
+    <header class="bg-white/90 backdrop-blur-md border-b-4 border-yellow-400 p-3 sm:p-4 shadow-lg flex justify-between items-center z-20">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Pulsante Torna alla Home / Schermata Iniziale -->
+            <button onclick="backToMenu()" title="Torna alla Home" class="btn-3d bg-purple-600 hover:bg-purple-500 text-white font-bold p-3 rounded-2xl text-base sm:text-lg flex items-center justify-center gap-2 border-2 border-purple-700 shadow-md">
+                <i class="fa-solid fa-house text-yellow-300"></i>
+                <span class="hidden md:inline font-extrabold text-sm">Home</span>
+            </button>
+
+            <div class="bg-yellow-400 text-purple-900 font-bold p-3 rounded-2xl text-2xl shadow-md animate-bounce">
+                🇬🇧 🌟
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-3xl font-extrabold text-purple-900 tracking-wide">IT & THEY Super Stars!</h1>
+                <p class="text-xs sm:text-sm font-bold text-indigo-600 hidden sm:block">Scuola Senza Zaino • Classe 3ª Primary</p>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="flex items-center gap-2 sm:gap-4">
+            <!-- Tasto Ruota Estrazione Alunno (attivo solo in modalità Tutti insieme) -->
+            <button id="wheelHeaderBtn" onclick="openStudentPicker()" class="btn-3d bg-amber-400 hover:bg-amber-300 text-purple-950 font-black text-lg sm:text-xl px-4 py-3 rounded-2xl flex items-center gap-2 border-2 border-yellow-500">
+                <i class="fa-solid fa-dice text-2xl"></i>
+                <span class="hidden md:inline">Chi viene alla LIM?</span>
+                <span class="bg-purple-900 text-yellow-300 px-2 py-0.5 rounded-xl text-sm font-bold" id="studentsRemainingBadge">22</span>
+            </button>
+
+            <!-- Registro Docente Live -->
+            <button onclick="openReportModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2.5 rounded-2xl text-base flex items-center gap-2 border-2 border-indigo-700 shadow-md">
+                <i class="fa-solid fa-clipboard-list text-yellow-300 text-xl"></i>
+                <span class="hidden lg:inline">Registro Docente</span>
+            </button>
+
+            <!-- Audio Toggle -->
+            <button onclick="toggleAudio()" id="audioBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 p-3 rounded-2xl text-xl border-2 border-slate-300">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- SCHERMO PRINCIPALE -->
+    <main class="flex-grow flex items-center justify-center p-3 sm:p-6 z-10">
+        
+        <!-- MAIN CARD -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-3xl p-4 sm:p-8 shadow-2xl border-8 border-white/50 w-full max-w-5xl flex flex-col justify-between min-h-[600px] relative">
+            
+            <!-- SCHERMATA INIZIALE E CONFIGURAZIONE MODALITÀ -->
+            <div id="startScreen" class="flex flex-col items-center justify-center text-center my-auto space-y-6 py-4">
+                <div class="inline-block bg-purple-100 text-purple-800 font-extrabold px-6 py-2 rounded-full text-lg uppercase tracking-wider border-2 border-purple-300">
+                    Ripasso Grammaticale Prima della Verifica 🚀
+                </div>
+                <h2 class="text-4xl sm:text-5xl font-black text-purple-900 leading-tight">
+                    Impara con <span class="text-yellow-500 underline decoration-wavy">IT</span> e <span class="text-cyan-500 underline decoration-wavy">THEY</span>!
+                </h2>
+
+                <!-- 1. SELEZIONE MODALITÀ DI GIOCO -->
+                <div class="w-full max-w-3xl bg-slate-50 p-4 sm:p-6 rounded-3xl border-4 border-indigo-100 text-left shadow-sm">
+                    <h3 class="text-xl font-black text-indigo-900 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-yellow-500"></i> 1. Scegli come volete giocare:
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button onclick="selectMode('class')" id="modeBtn_class" class="mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-yellow-400 text-purple-950 border-yellow-500">
+                            <span class="text-3xl">👥</span>
+                            <span class="text-sm font-extrabold">Tutti Insieme</span>
+                            <span class="text-[10px] font-bold opacity-80">(Ruota 22 alunni)</span>
+                        </button>
+
+                        <button onclick="selectMode('individual')" id="modeBtn_individual" class="mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-white text-slate-700 border-slate-200">
+                            <span class="text-3xl">👤</span>
+                            <span class="text-sm font-extrabold">Individuale</span>
+                            <span class="text-[10px] font-bold opacity-80">(Nome per nome)</span>
+                        </button>
+
+                        <button onclick="selectMode('pair')" id="modeBtn_pair" class="mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-white text-slate-700 border-slate-200">
+                            <span class="text-3xl">👯</span>
+                            <span class="text-sm font-extrabold">A Coppie</span>
+                            <span class="text-[10px] font-bold opacity-80">(2 bambini per turno)</span>
+                        </button>
+
+                        <button onclick="selectMode('trio')" id="modeBtn_trio" class="mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-white text-slate-700 border-slate-200">
+                            <span class="text-3xl">🔺</span>
+                            <span class="text-sm font-extrabold">A Trio</span>
+                            <span class="text-[10px] font-bold opacity-80">(3 bambini per turno)</span>
+                        </button>
+                    </div>
+
+                    <!-- BOX CONFIGURAZIONE PARTECIPANTI (Per Individuale, Coppie, Trio) -->
+                    <div id="participantsBox" class="hidden mt-4 pt-4 border-t-2 border-slate-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-extrabold text-sm text-purple-900" id="participantsLabel">
+                                Inserisci i nomi dei giocatori/gruppi:
+                            </label>
+                            <button onclick="autoGenerateGroups()" class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-xl border border-indigo-300">
+                                ⚡ Genera Autom. dai 22 Alunni della Classe
+                            </button>
+                        </div>
+                        
+                        <div id="playersListInputs" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                            <!-- Generato via Javascript -->
+                        </div>
+
+                        <button onclick="addPlayerInput()" class="mt-2 text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-plus-circle"></i> Aggiungi un altro giocatore/gruppo
+                        </button>
+                    </div>
+
+                    <!-- 2. SELEZIONE NUMERO DOMANDE -->
+                    <div class="mt-5 pt-4 border-t-2 border-slate-200">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                            <div>
+                                <label class="font-black text-indigo-900 text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-list-check text-indigo-500"></i> 2. Numero Domande per la Partita:
+                                </label>
+                                <p class="text-xs text-slate-500 font-bold" id="questionRangeInfo">
+                                    Tutti insieme: fino a 40 domande!
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="questionCountRange" min="10" max="40" value="20" step="1" oninput="updateQuestionCountDisplay(this.value)" class="w-36 accent-purple-600">
+                                <span id="questionCountDisplay" class="bg-purple-900 text-yellow-300 font-black px-4 py-1.5 rounded-xl text-lg min-w-[60px] text-center">
+                                    20
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PULSANTI AVVIO E GESTIONE NOMI CLASSE -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full justify-center items-center pt-2">
+                    <button onclick="prepareAndStartGame()" class="btn-3d bg-emerald-500 hover:bg-emerald-400 text-white font-black text-2xl sm:text-3xl px-10 py-5 rounded-3xl w-full sm:w-auto flex items-center justify-center gap-3 border-4 border-emerald-600 animate-pulse-grow">
+                        <i class="fa-solid fa-play text-3xl"></i> INIZIA IL GIOCO!
+                    </button>
+                    <button onclick="openStudentManager()" class="btn-3d bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xl px-6 py-5 rounded-3xl w-full sm:w-auto flex items-center justify-center gap-2 border-4 border-indigo-600">
+                        <i class="fa-solid fa-users text-2xl"></i> Gestisci Nomi Classe (22)
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCHERMATA DELLE DOMANDE (GAMEPLAY) -->
+            <div id="gameScreen" class="hidden flex-col justify-between h-full space-y-4">
+                
+                <!-- Status Top Game Bar -->
+                <div class="flex flex-wrap justify-between items-center bg-purple-50 p-3 rounded-2xl border-2 border-purple-200 gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-purple-600 text-white font-bold text-sm sm:text-base px-3 py-1 rounded-xl" id="questionCategory">
+                            Category
+                        </span>
+                        <span class="text-slate-600 font-bold text-sm" id="questionCounter">Domanda 1/20</span>
+                        <span class="bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-sm px-2.5 py-1 rounded-xl flex items-center gap-1">
+                            ⭐ <span id="scoreDisplay">0</span> pt
+                        </span>
+                    </div>
+
+                    <!-- Indicatore Alunno/Gruppo di Turno -->
+                    <div class="bg-yellow-300 text-purple-950 px-4 py-1.5 rounded-xl font-black text-base sm:text-lg border-2 border-yellow-400 flex items-center gap-2 shadow-sm" id="currentTurnBadge">
+                        <i class="fa-solid fa-child text-purple-800"></i> Turno di: <span id="currentTurnName" class="underline">Tutti insieme!</span>
+                    </div>
+                </div>
+
+                <!-- Box dell'Immagine / Visual Prompt -->
+                <div class="flex flex-col items-center justify-center bg-slate-50 border-4 border-indigo-100 rounded-3xl p-4 sm:p-6 my-2 min-h-[190px] relative shadow-inner">
+                    <div id="visualPrompt" class="text-7xl sm:text-8xl mb-3 filter drop-shadow-md transition-all duration-300 hover:scale-110">
+                        🐶
+                    </div>
+
+                    <h3 id="questionText" class="text-2xl sm:text-4xl font-black text-purple-950 text-center leading-relaxed">
+                        Completa la frase...
+                    </h3>
+                    <p id="subQuestionText" class="text-slate-600 font-extrabold text-base sm:text-xl text-center mt-1">
+                        Scegli l'opzione corretta!
+                    </p>
+                </div>
+
+                <!-- Griglia dei Pulsanti di Risposta (LIM Touch Friendly) -->
+                <div id="optionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 my-2">
+                    <!-- Generati dinamicamente -->
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="feedbackBanner" class="hidden p-4 rounded-2xl text-center font-black text-xl sm:text-2xl transition-all border-4 shadow-md">
+                    <!-- Inserito via JS -->
+                </div>
+
+                <!-- Pulsante Avanti / Prossima Domanda -->
+                <div class="flex justify-end pt-2">
+                    <button id="nextBtn" onclick="nextQuestion()" class="hidden btn-3d bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-2xl px-8 py-4 rounded-2xl items-center gap-3 border-4 border-yellow-500">
+                        Prossima Domanda <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCHERMATA FINALE DI VITTORIA (RESULTS) -->
+            <div id="resultScreen" class="hidden flex-col items-center justify-center text-center my-auto space-y-6 py-6">
+                <div class="text-8xl animate-bounce">🏆</div>
+                <h2 class="text-4xl sm:text-6xl font-black text-purple-900">SUPER FANTASTICI!</h2>
+                <p class="text-2xl font-bold text-slate-700">Avete completato il ripasso con successo!</p>
+
+                <div class="bg-yellow-100 border-4 border-yellow-400 p-6 rounded-3xl max-w-lg w-full shadow-lg">
+                    <p class="text-lg font-extrabold text-amber-900">PUNTEGGIO FINALE:</p>
+                    <p class="text-6xl font-black text-purple-900 my-2" id="finalScore">0</p>
+                    <p class="text-sm font-bold text-amber-800">Tutti pronti per prendere 10 nella verifica! 🌟</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="openReportModal()" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl px-8 py-4 rounded-2xl border-4 border-indigo-700 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-yellow-300"></i> VEDI REGISTRO DOCENTE
+                    </button>
+
+                    <button onclick="backToMenu()" class="btn-3d bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xl px-8 py-4 rounded-2xl border-4 border-emerald-600 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> NUOVA PARTITA
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER COLLABORATIVO -->
+    <footer class="bg-white/80 backdrop-blur-md text-center py-2 border-t-2 border-white/40 text-purple-900 font-bold text-xs sm:text-sm">
+        Scuola Senza Zaino • Gioco Didattico per LIM • English Primary Class 3ª
+    </footer>
+
+    <!-- MODALE ESTRATTORE ALUNNI (CHI VIENE ALLA LIM?) -->
+    <div id="studentModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border-8 border-yellow-400 shadow-2xl text-center relative flex flex-col items-center">
+            
+            <button onclick="closeStudentPicker()" class="absolute top-4 right-4 bg-slate-200 hover:bg-slate-300 text-slate-700 w-10 h-10 rounded-full font-black text-xl flex items-center justify-center">
+                ✕
+            </button>
+
+            <div class="bg-purple-100 text-purple-900 font-black px-4 py-2 rounded-2xl text-xl mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-dice text-yellow-500"></i> Estrazione Alunno LIM
+            </div>
+
+            <div class="bg-purple-50 border-4 border-purple-200 rounded-3xl p-8 w-full my-4 min-h-[160px] flex flex-col items-center justify-center shadow-inner">
+                <p class="text-slate-500 font-bold text-sm uppercase tracking-wider mb-2">Viene alla LIM...</p>
+                <h3 id="pickedStudentName" class="text-4xl sm:text-5xl font-black text-purple-900 transition-all">
+                    Premi il tasto! 🎲
+                </h3>
+            </div>
+
+            <div class="flex gap-3 w-full">
+                <button id="spinBtn" onclick="spinStudentWheel()" class="btn-3d bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-2xl py-4 rounded-2xl w-full border-4 border-yellow-500 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate text-2xl"></i> ESTRAI NOME!
+                </button>
+            </div>
+            
+            <p class="text-xs font-bold text-slate-400 mt-4">
+                Rimasti da chiamare: <span id="modalRemainingCount">22</span> su 22
+            </p>
+        </div>
+    </div>
+
+    <!-- MODALE GESTIONE LISTA 22 ALUNNI PREDEFINITI -->
+    <div id="managerModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-xl w-full border-8 border-indigo-400 shadow-2xl flex flex-col max-h-[90vh]">
+            
+            <div class="flex justify-between items-center mb-4 border-b-2 border-slate-100 pb-3">
+                <h3 class="text-2xl font-black text-indigo-900 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-indigo-500"></i> Nomi della Classe (22 Alunni)
+                </h3>
+                <button onclick="closeStudentManager()" class="bg-slate-200 text-slate-700 w-10 h-10 rounded-full font-black text-xl">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-500 font-bold mb-3">
+                Modifica i nomi dei 22 bambini della tua classe:
+            </p>
+
+            <div class="overflow-y-auto flex-grow pr-2 mb-4">
+                <div id="studentInputsGrid" class="grid grid-cols-2 gap-2">
+                    <!-- Generati da JS -->
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t-2 border-slate-100">
+                <button onclick="resetDefaultNames()" class="text-xs font-bold text-red-500 hover:underline">
+                    Ripristina Nomi Predefiniti
+                </button>
+                <button onclick="saveStudentNames()" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-black px-6 py-3 rounded-2xl border-2 border-indigo-700">
+                    Salva Nomi Classe
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE REGISTRO DOCENTE / VALUTAZIONE E RISULTATI -->
+    <div id="reportModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-4xl w-full border-8 border-indigo-500 shadow-2xl flex flex-col max-h-[90vh]">
+            
+            <div class="flex justify-between items-center border-b-2 border-slate-200 pb-4 mb-4">
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-black text-indigo-950 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-yellow-500"></i> Registro Valutazione Docente
+                    </h3>
+                    <p class="text-xs font-bold text-slate-500">Risultati di ciascun studente/gruppo e storico degli errori</p>
+                </div>
+                <button onclick="closeReportModal()" class="bg-slate-200 text-slate-700 w-10 h-10 rounded-full font-black text-xl hover:bg-slate-300">✕</button>
+            </div>
+
+            <!-- Tabella dei Risultati -->
+            <div class="overflow-y-auto flex-grow pr-2">
+                <div id="reportContainer">
+                    <!-- Contenuto generato via JS -->
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-4 border-t-2 border-slate-200 mt-4">
+                <button onclick="printReport()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-slate-300">
+                    <i class="fa-solid fa-print"></i> Stampa Registro / Salva PDF
+                </button>
+                <button onclick="closeReportModal()" class="btn-3d bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl border-2 border-indigo-700">
+                    Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGICA DI GIOCO JAVASCRIPT -->
+    <script>
+        // Lista dei 22 studenti predefinita
+        const DEFAULT_STUDENTS = [
+            "Alessandro", "Alice", "Andrea", "Beatrice", "Chiara",
+            "Edoardo", "Elena", "Emma", "Francesca", "Gabriele",
+            "Giorgia", "Giulia", "Leonardo", "Lorenzo", "Luca",
+            "Marco", "Martina", "Matteo", "Samuele", "Sara",
+            "Sofia", "Tommaso"
+        ];
+
+        let studentList = [...DEFAULT_STUDENTS];
+        let availableStudents = [...studentList];
+        let currentStudent = null;
+
+        // Stato Modalità di Gioco
+        let currentGameMode = 'class'; // 'class', 'individual', 'pair', 'trio'
+        let selectedQuestionCount = 20;
+
+        // Lista Giocatori attivi per la sessione
+        let activePlayers = []; // Array di oggetti: { id, name, correct: 0, wrong: 0, history: [] }
+        let currentTurnIndex = 0;
+
+        // Punteggio e Indici
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let audioEnabled = true;
+        let activeGameQuestions = [];
+
+        // BANCA DATI COMPLETA DI 40 DOMANDE SU IT E THEY (Affermativa, Negativa, Interrogativa, Lunga e Contratta)
+        const ALL_QUESTIONS = [
+            { category: "Forma Affermativa", visual: "🐶", question: "Look! _____ a cute dog.", subText: "Forma contratta per singolare:", options: ["It's", "They're", "Is it", "They are"], answer: 0, explanation: "Per 1 animale singolare usiamo IT'S (It is)!" },
+            { category: "Forma Lunga e Contratta", visual: "🍏", question: "Forma LUNGA: 'It is a green apple.'", subText: "Qual è la FORMA CONTRATTA?", options: ["They're", "It's", "It isn't", "Is it"], answer: 1, explanation: "'It is' si contrarre in 'IT'S'!" },
+            { category: "Forma Affermativa", visual: "🐱🐱🐱", question: "Look! _____ three cats.", subText: "Più gatti (plurale):", options: ["It's", "They're", "It is", "Is it"], answer: 1, explanation: "Essendo più di uno usiamo THEY'RE (They are)!" },
+            { category: "Forma Lunga e Contratta", visual: "🚗🚗", question: "Qual è la FORMA CONTRATTA di: 'They are red cars'?", subText: "Forma contratta plurale:", options: ["They're red cars", "It's red cars", "They aren't red cars", "Are they red cars"], answer: 0, explanation: "'They are' contrattato diventa 'THEY'RE'!" },
+            { category: "Forma Negativa", visual: "🍌", question: "_____ an apple. It's a banana!", subText: "Forma negativa contratta singolare:", options: ["It isn't", "They aren't", "It is", "They are"], answer: 0, explanation: "'IT ISN'T' significa 'Non è'!" },
+            { category: "Forma Lunga Negativa", visual: "⚽", question: "Qual è la FORMA LUNGA di 'It isn't a basketball'?", subText: "Forma estesa negativa:", options: ["It is not a basketball", "They are not a basketball", "It is a basketball", "Is it not a basketball"], answer: 0, explanation: "'It isn't' è la contrazione di 'IT IS NOT'!" },
+            { category: "Forma Negativa", visual: "📚📚", question: "_____ toys. They are books!", subText: "Forma negativa plurale:", options: ["They aren't", "It isn't", "They are", "It is"], answer: 0, explanation: "'THEY AREN'T' per il plurale negativo!" },
+            { category: "Forma Lunga e Contratta", visual: "🦆🦆", question: "FORMA LUNGA: 'They are not chickens.'", subText: "Trasforma in forma contratta:", options: ["They aren't chickens.", "It isn't chickens.", "They're chickens.", "Are they chickens?"], answer: 0, explanation: "'They are not' ➔ 'THEY AREN'T'!" },
+            { category: "Domande e Risposte Brevi", visual: "🐘", question: "Is it an elephant?", subText: "Rispondi affermativamente (Sì):", options: ["Yes, it is.", "Yes, they are.", "No, it isn't.", "Yes, it's."], answer: 0, explanation: "Short answer affermativa: 'Yes, it is' (senza contrazione)!" },
+            { category: "Domande e Risposte Brevi", visual: "🍕", question: "Is it an ice cream?", subText: "Guarda la figura (Pizza!). Rispondi:", options: ["No, it isn't.", "Yes, it is.", "No, they aren't.", "No, it is."], answer: 0, explanation: "'No, it isn't. It's a pizza!'" },
+            { category: "Domanda + Risposta Completa", visual: "🚲", question: "Is it a car? ➔ No, it isn't. _____ a bike!", subText: "Completa la risposta:", options: ["It's", "They're", "Is it", "They aren't"], answer: 0, explanation: "'No, it isn't. IT'S a bike!'" },
+            { category: "Domande e Risposte Brevi", visual: "🎈🎈🎈", question: "Are they balloons?", subText: "Rispondi affermativamente (Sì):", options: ["Yes, they are.", "Yes, it is.", "No, they aren't.", "Yes, they're."], answer: 0, explanation: "Per 'Are they...?' la risposta affermativa è 'Yes, they are'!" },
+            { category: "Domande e Risposte Brevi", visual: "🎁🎁", question: "Are they pencils?", subText: "Guarda la figura (Regali!). Rispondi:", options: ["No, they aren't.", "Yes, they are.", "No, it isn't.", "No, they are."], answer: 0, explanation: "'No, they aren't. They are presents!'" },
+            { category: "Domanda + Risposta Completa", visual: "🦁🦁", question: "Are they dogs? ➔ No, they aren't. _____ lions!", subText: "Completa la frase:", options: ["They're", "It's", "Are they", "It isn't"], answer: 0, explanation: "'No, they aren't. THEY'RE lions!'" },
+            { category: "Riconosci il Soggetto", visual: "✏️", question: "What subject do we use for ONE pencil?", subText: "Quale soggetto per 1 cosa?", options: ["IT", "THEY", "ARE", "IS"], answer: 0, explanation: "Per 1 oggetto usiamo sempre IT!" },
+            { category: "Riconosci il Soggetto", visual: "🦋🦋", question: "What subject do we use for TWO butterflies?", subText: "Quale soggetto per cose plurali?", options: ["THEY", "IT", "IS", "IT'S"], answer: 0, explanation: "Per cose o animali al PLURALE usiamo THEY!" },
+            { category: "Sfida Frasi Negative", visual: "❌ 🐶", question: "Quale frase significa 'Essi NON sono cani'?", subText: "Scegli la traduzione corretta:", options: ["They aren't dogs.", "It isn't a dog.", "They're dogs.", "Is it a dog?"], answer: 0, explanation: "'They aren't dogs' (They are not)." },
+            { category: "Short Answers", visual: "☀️", question: "Is it hot today?", subText: "Rispondi di Sì:", options: ["Yes, it is.", "Yes, it's.", "Yes, they are.", "No, it isn't."], answer: 0, explanation: "Nelle risposte brevi affermative si usa la forma estesa 'Yes, it is'!" },
+            // Nuove Domande Aggiuntive per Arrivare a 40 Domande
+            { category: "Forma Affermativa", visual: "🚀", question: "Look! _____ a fast rocket.", subText: "Scegli la forma contratta:", options: ["It's", "They're", "Is it", "They are"], answer: 0, explanation: "Per un singolo oggetto usiamo IT'S!" },
+            { category: "Forma Affermativa", visual: "🐝🐝🐝", question: "Look! _____ yellow bees.", subText: "Scegli la forma contratta plurale:", options: ["They're", "It's", "Is it", "It is"], answer: 0, explanation: "Per più insetti usiamo THEY'RE!" },
+            { category: "Domande e Risposte", visual: "🍎", question: "Is it a red apple?", subText: "Guarda la mela (Sì):", options: ["Yes, it is.", "Yes, it's.", "Yes, they are.", "No, it isn't."], answer: 0, explanation: "Risposta corretta: 'Yes, it is'!" },
+            { category: "Domande e Risposte", visual: "🐶🐶", question: "Are they cute puppies?", subText: "Guarda i cagnolini (Sì):", options: ["Yes, they are.", "Yes, it is.", "No, they aren't.", "Yes, they're."], answer: 0, explanation: "'Yes, they are'!" },
+            { category: "Domande e Risposte", visual: "🐱", question: "Is it a dog?", subText: "Guarda il gatto (No):", options: ["No, it isn't.", "Yes, it is.", "No, they aren't.", "No, it is."], answer: 0, explanation: "'No, it isn't. It's a cat!'" },
+            { category: "Domande e Risposte", visual: "🐸🐸", question: "Are they birds?", subText: "Guarda le rane (No):", options: ["No, they aren't.", "Yes, they are.", "No, it isn't.", "No, they are."], answer: 0, explanation: "'No, they aren't. They are frogs!'" },
+            { category: "Forma Affermativa", visual: "🍦", question: "_____ a delicious ice cream.", subText: "Completa:", options: ["It's", "They're", "Are they", "They are"], answer: 0, explanation: "1 gelato ➔ IT'S a delicious ice cream." },
+            { category: "Forma Affermativa", visual: "⭐️⭐️⭐️", question: "_____ bright stars in the sky.", subText: "Completa per il plurale:", options: ["They're", "It's", "Is it", "It is"], answer: 0, explanation: "Più stelle ➔ THEY'RE bright stars." },
+            { category: "Forma Negativa", visual: "📕", question: "_____ a pencil. It is a notebook!", subText: "Forma negativa:", options: ["It isn't", "They aren't", "It is", "They are"], answer: 0, explanation: "'IT ISN'T a pencil' (Non è una matita)." },
+            { category: "Forma Negativa", visual: "👟👟", question: "_____ boots. They are shoes!", subText: "Forma negativa plurale:", options: ["They aren't", "It isn't", "They are", "It is"], answer: 0, explanation: "'THEY AREN'T boots' (Non sono stivali)." },
+            { category: "Forma Lunga e Contratta", visual: "🎒", question: "FORMA CONTRATTA di: 'It is a yellow schoolbag'", subText: "Scegli l'opzione contratta:", options: ["It's a yellow schoolbag", "They're yellow schoolbags", "It isn't a schoolbag", "Is it a schoolbag"], answer: 0, explanation: "'It is' ➔ 'IT'S'!" },
+            { category: "Forma Lunga e Contratta", visual: "🌺🌺", question: "FORMA CONTRATTA di: 'They are pink flowers'", subText: "Scegli l'opzione contratta:", options: ["They're pink flowers", "It's pink flowers", "They aren't pink flowers", "Are they pink flowers"], answer: 0, explanation: "'They are' ➔ 'THEY'RE'!" },
+            { category: "Domande e Risposte", visual: "🌧️", question: "Is it rainy today?", subText: "Rispondi affermativamente:", options: ["Yes, it is.", "Yes, it's.", "Yes, they are.", "No, it isn't."], answer: 0, explanation: "'Yes, it is'!" },
+            { category: "Domande e Risposte", visual: "🦖🦖", question: "Are they green dinosaurs?", subText: "Rispondi affermativamente:", options: ["Yes, they are.", "Yes, it is.", "No, they aren't.", "Yes, they're."], answer: 0, explanation: "'Yes, they are'!" },
+            { category: "Domande e Risposte", visual: "🍰", question: "Is it a pizza?", subText: "Guarda la torta (No):", options: ["No, it isn't.", "Yes, it is.", "No, they aren't.", "No, it is."], answer: 0, explanation: "'No, it isn't. It's a cake!'" },
+            { category: "Domande e Risposte", visual: "🛸🛸", question: "Are they planes?", subText: "Guarda gli UFO (No):", options: ["No, they aren't.", "Yes, they are.", "No, it isn't.", "No, they are."], answer: 0, explanation: "'No, they aren't. They are UFOs!'" },
+            { category: "Forma Lunga Negativa", visual: "🤖", question: "Qual è la FORMA LUNGA di: 'It isn't a robot'?", subText: "Trasforma in forma estesa:", options: ["It is not a robot", "They are not a robot", "It is a robot", "Is it a robot"], answer: 0, explanation: "'It isn't' = 'IT IS NOT'!" },
+            { category: "Forma Lunga Negativa", visual: "🚀🚀", question: "Qual è la FORMA LUNGA di: 'They aren't rockets'?", subText: "Trasforma in forma estesa:", options: ["They are not rockets", "It is not rockets", "They are rockets", "Are they rockets"], answer: 0, explanation: "'They aren't' = 'THEY ARE NOT'!" },
+            { category: "Short Answers", visual: "🐼", question: "Is it a panda? ➔ Yes, ____.", subText: "Completa la risposta breve:", options: ["it is", "it's", "they are", "it isn't"], answer: 0, explanation: "'Yes, IT IS'!" },
+            { category: "Short Answers", visual: "🐬🐬", question: "Are they dolphins? ➔ Yes, ____.", subText: "Completa la risposta breve:", options: ["they are", "they're", "it is", "they aren't"], answer: 0, explanation: "'Yes, THEY ARE'!" },
+            { category: "Short Answers", visual: "🛵", question: "Is it a motorbike? ➔ No, ____.", subText: "Completa la risposta breve negativa:", options: ["it isn't", "it is", "they aren't", "it not"], answer: 0, explanation: "'No, IT ISN'T'!" },
+            { category: "Short Answers", visual: "🐯🐯", question: "Are they cats? ➔ No, ____.", subText: "Completa la risposta breve negativa:", options: ["they aren't", "it isn't", "they are", "they not"], answer: 0, explanation: "'No, THEY AREN'T'!" }
+        ];
+
+        // INIZIALIZZAZIONE
+        window.onload = function() {
+            loadSavedStudents();
+            selectMode('class');
+        };
+
+        // AUDIO ENGINE (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(180, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'spin') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400 + Math.random() * 200, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch(e) {}
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audioBtn');
+            btn.innerHTML = audioEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark text-red-500"></i>';
+        }
+
+        // SELEZIONE MODALITÀ DI GIOCO
+        function selectMode(mode) {
+            currentGameMode = mode;
+            
+            // Aggiorna stile pulsanti modalità
+            ['class', 'individual', 'pair', 'trio'].forEach(m => {
+                const btn = document.getElementById(`modeBtn_${m}`);
+                if (m === mode) {
+                    btn.className = "mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-yellow-400 text-purple-950 border-yellow-500 scale-105 shadow-md";
+                } else {
+                    btn.className = "mode-btn btn-3d p-4 rounded-2xl border-4 font-black text-center flex flex-col items-center gap-2 bg-white text-slate-700 border-slate-200";
+                }
+            });
+
+            const pBox = document.getElementById('participantsBox');
+            const rangeInput = document.getElementById('questionCountRange');
+            const rangeInfo = document.getElementById('questionRangeInfo');
+            const wheelBtn = document.getElementById('wheelHeaderBtn');
+
+            if (mode === 'class') {
+                pBox.classList.add('hidden');
+                wheelBtn.classList.remove('hidden');
+                rangeInput.min = "10";
+                rangeInput.max = "40";
+                if (rangeInput.value < 10) rangeInput.value = 20;
+                rangeInfo.innerText = "Modalità Tutti insieme: puoi scegliere da 10 fino a 40 domande!";
+            } else {
+                pBox.classList.remove('hidden');
+                wheelBtn.classList.add('hidden');
+                rangeInput.min = "10";
+                rangeInput.max = "20";
+                if (rangeInput.value > 20) rangeInput.value = 20;
+                if (rangeInput.value < 10) rangeInput.value = 10;
+                
+                if (mode === 'individual') {
+                    document.getElementById('participantsLabel').innerText = "Nomi dei singoli Giocatori:";
+                    rangeInfo.innerText = "Modalità Individuale: puoi scegliere da 10 a 20 domande.";
+                } else if (mode === 'pair') {
+                    document.getElementById('participantsLabel').innerText = "Nomi delle Coppie di Bambini:";
+                    rangeInfo.innerText = "Modalità A Coppie: puoi scegliere da 10 a 20 domande.";
+                } else if (mode === 'trio') {
+                    document.getElementById('participantsLabel').innerText = "Nomi dei Trio di Bambini:";
+                    rangeInfo.innerText = "Modalità A Trio: puoi scegliere da 10 a 20 domande.";
+                }
+
+                autoGenerateGroups(); // Genera partecipanti di default
+            }
+
+            updateQuestionCountDisplay(rangeInput.value);
+        }
+
+        function updateQuestionCountDisplay(val) {
+            selectedQuestionCount = parseInt(val);
+            document.getElementById('questionCountDisplay').innerText = val;
+        }
+
+        // GENERAZIONE E GESTIONE INPUT GIOCATORI/GRUPPI
+        function autoGenerateGroups() {
+            const container = document.getElementById('playersListInputs');
+            container.innerHTML = '';
+            
+            if (currentGameMode === 'individual') {
+                // Inserisci i 22 nomi singoli
+                studentList.forEach((name, i) => {
+                    container.appendChild(createPlayerInputHTML(`Giocatore ${i+1}`, name));
+                });
+            } else if (currentGameMode === 'pair') {
+                // Raggruppa a 2 a 2
+                let pairIndex = 1;
+                for (let i = 0; i < studentList.length; i += 2) {
+                    const pName = studentList[i+1] ? `${studentList[i]} & ${studentList[i+1]}` : studentList[i];
+                    container.appendChild(createPlayerInputHTML(`Coppia ${pairIndex++}`, pName));
+                }
+            } else if (currentGameMode === 'trio') {
+                // Raggruppa a 3 a 3
+                let trioIndex = 1;
+                for (let i = 0; i < studentList.length; i += 3) {
+                    const group = studentList.slice(i, i + 3).join(" & ");
+                    container.appendChild(createPlayerInputHTML(`Trio ${trioIndex++}`, group));
+                }
+            }
+        }
+
+        function createPlayerInputHTML(labelPlaceholder, val = "") {
+            const div = document.createElement('div');
+            div.className = "flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-300";
+            div.innerHTML = `
+                <i class="fa-solid fa-user-tag text-indigo-400"></i>
+                <input type="text" value="${val}" placeholder="${labelPlaceholder}" class="player-input font-bold text-slate-800 text-sm bg-transparent border-none focus:outline-none w-full">
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 font-bold px-1">✕</button>
+            `;
+            return div;
+        }
+
+        function addPlayerInput() {
+            const container = document.getElementById('playersListInputs');
+            container.appendChild(createPlayerInputHTML(`Nuovo Giocatore/Gruppo`));
+        }
+
+        // AVVIO PARTITA
+        function prepareAndStartGame() {
+            activePlayers = [];
+            currentTurnIndex = 0;
+            score = 0;
+            currentQuestionIndex = 0;
+
+            if (currentGameMode === 'class') {
+                activePlayers.push({
+                    id: 'class',
+                    name: 'Tutti insieme (Classe)',
+                    correct: 0,
+                    wrong: 0,
+                    history: []
+                });
+            } else {
+                const inputs = document.querySelectorAll('.player-input');
+                inputs.forEach((inp, i) => {
+                    const name = inp.value.trim();
+                    if (name) {
+                        activePlayers.push({
+                            id: `player_${i}`,
+                            name: name,
+                            correct: 0,
+                            wrong: 0,
+                            history: []
+                        });
+                    }
+                });
+
+                if (activePlayers.length === 0) {
+                    activePlayers.push({ id: 'player_1', name: 'Giocatore 1', correct: 0, wrong: 0, history: [] });
+                }
+            }
+
+            // Prepara le domande mescolandole e tagliandole alla quantità scelta
+            const shuffled = [...ALL_QUESTIONS].sort(() => Math.random() - 0.5);
+            activeGameQuestions = shuffled.slice(0, selectedQuestionCount);
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = activeGameQuestions[currentQuestionIndex];
+            const activePlayer = activePlayers[currentTurnIndex];
+
+            // Reset Banner
+            document.getElementById('feedbackBanner').classList.add('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('flex');
+
+            // Metadata UI
+            document.getElementById('questionCategory').innerText = q.category;
+            document.getElementById('questionCounter').innerText = `Domanda ${currentQuestionIndex + 1} di ${activeGameQuestions.length}`;
+            
+            // Turno Alunno / Gruppo
+            if (currentGameMode === 'class') {
+                const turnName = currentStudent ? currentStudent : "Tutti insieme!";
+                document.getElementById('currentTurnName').innerText = turnName;
+            } else {
+                document.getElementById('currentTurnName').innerText = activePlayer.name;
+            }
+
+            // Visual Prompt
+            document.getElementById('visualPrompt').innerText = q.visual;
+            document.getElementById('questionText').innerText = q.question;
+            document.getElementById('subQuestionText').innerText = q.subText;
+
+            // Render Opzioni
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-3d bg-indigo-50 hover:bg-purple-100 text-purple-950 font-black text-xl sm:text-2xl p-5 rounded-2xl border-4 border-indigo-200 flex items-center justify-center text-center transition-all min-h-[80px]`;
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, clickedBtn) {
+            const q = activeGameQuestions[currentQuestionIndex];
+            const activePlayer = activePlayers[currentTurnIndex];
+            const allBtns = document.getElementById('optionsGrid').children;
+
+            // Disabilita tasti
+            for (let btn of allBtns) {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-purple-100');
+            }
+
+            const banner = document.getElementById('feedbackBanner');
+            banner.classList.remove('hidden');
+
+            const isCorrect = (selectedIndex === q.answer);
+
+            // Registra nel profilo dello studente/gruppo attivo per la valutazione docente!
+            activePlayer.history.push({
+                questionNum: currentQuestionIndex + 1,
+                visual: q.visual,
+                questionText: q.question,
+                givenAnswer: q.options[selectedIndex],
+                correctAnswer: q.options[q.answer],
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                activePlayer.correct++;
+                score += 10;
+                playSound('correct');
+                clickedBtn.className = "btn-3d bg-emerald-500 text-white font-black text-2xl p-5 rounded-2xl border-4 border-emerald-600 scale-105 shadow-xl";
+                
+                banner.className = "p-4 rounded-2xl text-center font-black text-xl sm:text-2xl border-4 bg-emerald-100 text-emerald-950 border-emerald-400 shadow-md animate-bounce";
+                banner.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> RISPOSTA CORRETTA! <br><span class="text-base font-extrabold text-emerald-800">${q.explanation}</span>`;
+
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            } else {
+                activePlayer.wrong++;
+                playSound('wrong');
+                clickedBtn.className = "btn-3d bg-red-500 text-white font-black text-2xl p-5 rounded-2xl border-4 border-red-600 animate-shake";
+                allBtns[q.answer].className = "btn-3d bg-emerald-400 text-white font-black text-2xl p-5 rounded-2xl border-4 border-emerald-500";
+
+                banner.className = "p-4 rounded-2xl text-center font-black text-xl sm:text-2xl border-4 bg-red-100 text-red-950 border-red-300 shadow-md";
+                banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-600"></i> Risposta Giusta: "${q.options[q.answer]}"<br><span class="text-base font-extrabold text-red-800">${q.explanation}</span>`;
+            }
+
+            const scoreEl = document.getElementById('scoreDisplay');
+            if (scoreEl) scoreEl.innerText = score;
+
+            // Mostra tasto Prossima Domanda
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.classList.remove('hidden');
+            nextBtn.classList.add('flex');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            // Ruota al prossimo giocatore/gruppo
+            currentTurnIndex = (currentTurnIndex + 1) % activePlayers.length;
+
+            if (currentQuestionIndex < activeGameQuestions.length) {
+                showQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('flex');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.add('flex');
+
+            document.getElementById('finalScore').innerText = score;
+            confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
+            playSound('correct');
+        }
+
+        function backToMenu() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('flex');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('flex');
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('startScreen').classList.add('flex');
+        }
+
+        // GESTIONE REGISTRO DOCENTE / RECORD RISULTATI
+        function openReportModal() {
+            const container = document.getElementById('reportContainer');
+            container.innerHTML = '';
+
+            if (activePlayers.length === 0 || activePlayers[0].history.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 font-bold">
+                        <i class="fa-solid fa-clipboard text-5xl mb-3 text-slate-300"></i>
+                        <p>Nessun dato registrato per questa sessione.</p>
+                        <p class="text-xs">Avvia una partita e rispondi alle domande per registrare le valutazioni!</p>
+                    </div>
+                `;
+            } else {
+                activePlayers.forEach((player, idx) => {
+                    const totalAns = player.correct + player.wrong;
+                    const percent = totalAns > 0 ? Math.round((player.correct / totalAns) * 100) : 0;
+
+                    let evaluationBadge = "⭐ Da ripassare";
+                    let badgeColor = "bg-red-100 text-red-800 border-red-300";
+                    if (percent >= 80) {
+                        evaluationBadge = "🌟 Eccellente!";
+                        badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                    } else if (percent >= 60) {
+                        evaluationBadge = "👍 Buono";
+                        badgeColor = "bg-yellow-100 text-yellow-800 border-yellow-300";
+                    }
+
+                    let historyHTML = '';
+                    player.history.forEach((h) => {
+                        historyHTML += `
+                            <div class="flex items-center justify-between text-xs p-2 rounded-xl mb-1 ${h.isCorrect ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">${h.visual}</span>
+                                    <span class="font-bold text-slate-800">D${h.questionNum}: ${h.questionText}</span>
+                                </div>
+                                <div>
+                                    ${h.isCorrect 
+                                        ? `<span class="font-black text-emerald-700">✓ ${h.givenAnswer}</span>` 
+                                        : `<span class="font-black text-red-600">✕ ${h.givenAnswer} (Giusta: ${h.correctAnswer})</span>`}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML += `
+                        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 mb-4">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-3 pb-2 border-b-2 border-slate-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-purple-900 text-yellow-300 font-black w-10 h-10 rounded-xl flex items-center justify-center text-lg">
+                                        ${idx + 1}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-black text-purple-950">${player.name}</h4>
+                                        <p class="text-xs text-slate-500 font-bold">Domande affrontate: ${totalAns}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-right">
+                                        <p class="text-sm font-black text-slate-700">Esatte: <span class="text-emerald-600">${player.correct}</span> / Errate: <span class="text-red-500">${player.wrong}</span></p>
+                                        <p class="text-xs font-bold text-slate-500">Accuratezza: ${percent}%</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-xl font-extrabold text-xs border ${badgeColor}">
+                                        ${evaluationBadge}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <details class="cursor-pointer">
+                                <summary class="text-xs font-black text-indigo-700 hover:underline">
+                                    🔍 Mostra Dettaglio Esercizi Risposti (${player.history.length})
+                                </summary>
+                                <div class="mt-2 space-y-1">
+                                    ${historyHTML}
+                                </div>
+                            </details>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('reportModal').classList.remove('hidden');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.add('hidden');
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // LOGICA ESTRATTORE CASUALE 22 ALUNNI (RUOTA)
+        function loadSavedStudents() {
+            const saved = localStorage.getItem('senzaZaino_students');
+            if (saved) {
+                try { studentList = JSON.parse(saved); } catch(e) { studentList = [...DEFAULT_STUDENTS]; }
+            }
+            availableStudents = [...studentList];
+            updateStudentsCount();
+        }
+
+        function updateStudentsCount() {
+            document.getElementById('studentsRemainingBadge').innerText = availableStudents.length;
+            document.getElementById('modalRemainingCount').innerText = availableStudents.length;
+        }
+
+        function openStudentPicker() {
+            document.getElementById('studentModal').classList.remove('hidden');
+            updateStudentsCount();
+        }
+
+        function closeStudentPicker() {
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        function spinStudentWheel() {
+            if (availableStudents.length === 0) availableStudents = [...studentList];
+
+            const spinBtn = document.getElementById('spinBtn');
+            const nameDisplay = document.getElementById('pickedStudentName');
+            spinBtn.disabled = true;
+
+            let counter = 0;
+            const totalSpins = 18;
+            const interval = setInterval(() => {
+                const randomTemp = studentList[Math.floor(Math.random() * studentList.length)];
+                nameDisplay.innerText = randomTemp;
+                playSound('spin');
+
+                counter++;
+                if (counter >= totalSpins) {
+                    clearInterval(interval);
+                    const selectedIndex = Math.floor(Math.random() * availableStudents.length);
+                    currentStudent = availableStudents[selectedIndex];
+                    availableStudents.splice(selectedIndex, 1);
+                    
+                    nameDisplay.innerText = "⭐ " + currentStudent + "! ⭐";
+                    playSound('correct');
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+
+                    document.getElementById('currentTurnName').innerText = currentStudent;
+                    updateStudentsCount();
+                    spinBtn.disabled = false;
+                }
+            }, 80);
+        }
+
+        function openStudentManager() {
+            const container = document.getElementById('studentInputsGrid');
+            container.innerHTML = '';
+            studentList.forEach((name, index) => {
+                container.innerHTML += `
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-400 w-6 text-right">${index + 1}.</span>
+                        <input type="text" value="${name}" id="studentInput_${index}" class="font-bold text-purple-900 bg-white border border-slate-300 rounded-lg px-2 py-1 w-full text-sm">
+                    </div>
+                `;
+            });
+            document.getElementById('managerModal').classList.remove('hidden');
+        }
+
+        function closeStudentManager() {
+            document.getElementById('managerModal').classList.add('hidden');
+        }
+
+        function saveStudentNames() {
+            const newNames = [];
+            for (let i = 0; i < studentList.length; i++) {
+                const val = document.getElementById(`studentInput_${i}`).value.trim();
+                newNames.push(val || `Alunno ${i+1}`);
+            }
+            studentList = newNames;
+            availableStudents = [...studentList];
+            localStorage.setItem('senzaZaino_students', JSON.stringify(studentList));
+            updateStudentsCount();
+            closeStudentManager();
+            if (currentGameMode !== 'class') autoGenerateGroups();
+        }
+
+        function resetDefaultNames() {
+            studentList = [...DEFAULT_STUDENTS];
+            availableStudents = [...studentList];
+            localStorage.removeItem('senzaZaino_students');
+            openStudentManager();
+        }
+    </script>
+</body>
+</html>
